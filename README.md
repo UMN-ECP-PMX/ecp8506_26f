@@ -2,7 +2,7 @@
 
 ## Schedule: Friday 10 am - 12 pm
 
-## [Syllabus]([https://docs.google.com/document/d/10sGRR4JHZd2ejpRFXVuqVYHEfvtkrHXR_mHusi9Xolk/edit#heading=h.hk7idht08u5a](https://docs.google.com/document/d/1bmoRY8rjYJb3QTwLJSCfIJpS7ySagApVMKWILQ-Dnrs/edit?tab=t.0))
+## [Syllabus](https://docs.google.com/document/d/1bmoRY8rjYJb3QTwLJSCfIJpS7ySagApVMKWILQ-Dnrs/edit?tab=t.0#heading=h.hk7idht08u5a)
 
 ## ECP8506 2026 Fall calendar
 
