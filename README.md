@@ -10,8 +10,8 @@
 |:-----:|:------------:|:----------------------------------------------------:|:----------------------------------------------------------:|
 | 01    | 09/11/2026   | Logistics + workflow setup                           | Shen Cheng, PhD                                            |
 | 02    | 09/18/2026   | Concepts of model-based quantitative decision making | Ya-Feng (Jay) Wen, PharmD, PhD                             |
-| 03    | 09/25/2026   | Introduction to `R`                                  | Samuel Callisto, PhD                                       |
-| 04    | 10/02/2026   | `NONMEM` nomenclature                                | Richard Brundage, PharmD, PhD                              |
+| 03    | 09/25/2026   | Introduction to `R` 1                                | Samuel Callisto, PhD                                       |
+| 04    | 10/02/2026   | Introduction to `R` 2                                | Samuel Callisto, PhD                              |
 | 05    | 10/09/2026   | Introduction to `mrgsolve` 1                         | Kyle Baron, PharmD, PhD                                    |
 | 06    | 10/16/2026   | ACoP2026 **NO CLASS**                                |                                                            |
 | 07    | 10/23/2026   | Introduction to `mrgsolve` 2                         | Shen Cheng, PhD                                            |
