@@ -1,0 +1,40 @@
+Version: 1
+
+Packages:
+  - tidyverse
+  - pdftools
+  - data.table
+  - here
+  - mrggsave
+  - patchwork
+  - pmplots
+  - pmtables
+  - mrgmisc
+  - nhanesA
+  - truncnorm
+  - mrgsolve
+  - mrgsim.sa
+  - clinPK
+  - GGally
+  - car
+  - yspec
+  - logitnorm
+
+Repos:
+  - MPN: https://mpn.metworx.com/snapshots/stable/2026-04-25
+  - CRAN: https://cran.r-project.org
+
+Customizations:
+  Packages:
+  - pdftools: 
+      Type: source
+      Env:
+        INCLUDE_DIR: '/users/1/cheng423/software.install/poppler2/24.12.0/include/poppler/cpp'
+        LIB_DIR: '/users/1/cheng423/software.install/poppler2/24.12.0/lib64'
+        PKG_CONFIG_PATH: '/users/1/cheng423/software.install/poppler2/24.12.0/lib64/pkgconfig:$PKG_CONFIG_PATH'
+        LD_LIBRARY_PATH: '/users/1/cheng423/software.install/poppler2/24.12.0/lib64:$LD_LIBRARY_PATH'
+
+Lockfile:
+    Type: renv
+
+Rpath: ${R_EXE_4_4}
