@@ -1,0 +1,126 @@
+---
+title: "Course overview"
+author: "Shen Cheng"
+date: "09/11/2026"
+format: revealjs
+editor: visual
+---
+
+## Objectives
+
+-   Introduce ourselves
+-   Syllabus
+-   Introduce tools for course material sharing
+    -   Github
+    -   Minnesota Supercomputing Institute (MSI)
+
+## Myself
+
+Shen Cheng, Ph.D.
+
+-   Assistant Professor at UMN ECP
+-   Contacts: cheng423\@umn.edu
+-   Office: 717 Delaware St. Room 464
+
+## Your Turn
+
+-   Your name
+-   Your role in this class (instructor/student/auditor)
+-   Your major/year in the program (if you are a student)
+-   Your job/experience (if you are working)
+-   Anything else that you'd like to share
+
+## Schedule
+
+-   10 am -12 pm weekly on Fridays
+-   Remote **ONLY**:
+    -   Zoom: <https://umn.zoom.us/j/96936402074?pwd=31zGLervZLXnKbZBOo7grepMeLmelH.1&jst=2>
+-   Course recordings will be shared via [Gdrive](https://drive.google.com/drive/u/0/folders/1kfPE1aeyKEH6898e0NQxo_cF_aKa5nPi)
+
+## Important Links
+
+-   [Github](https://github.com/UMN-ECP-PMX/ecp8506_26f)
+-   Minnesota Supercomputing Institute (MSI) group: `ecp8506`
+-   Communications:
+    -   Emails
+    
+## Parental leave 
+
+-   09/12/2026-10/22/2026
+-   Will still be available on my email
+-   Alternative contacts while leave: 
+    -   Kate Rask (rask0063\@umn.edu)
+    -   Melanie Nicol (mrnicol\@umn.edu)
+    
+## Grading{style="font-size: 0.8em"}
+
+-   Homework: 50%
+    -   Introduction to R
+    -   Introduction to mrgsolve
+    -   Deterministic simulation, stochastic simulation, and virtual population simulation
+    -   Simulation with parameter uncertainty
+    -   MIDD/MIPD case study
+-   Class participation 50%
+    -   Expect to attend each session if register for the course
+    -   Prior notification needed if absence is anticipated
+    
+## Objectives of the course
+
+-   Understand the concepts of model-informed decision making using pharmacometric simulations.
+-   Learn relevant tools (i.e., **`mrgsolve`**) to perform pharmacometric simulations.
+-   Know different simulation methods, and be able to identify a simulation method given application scenarios.  
+
+## What to Expect...
+
+-   **NOT** to teach pharmacometric model building/development.
+-   Focusing on what you can do (i.e., simulate) when you have a pharmacometric model already.
+-   PopPK model development: ECP8502/8503
+
+## Github (`git` installation as needed)
+
+-   Check if `git` is installed locally: `git --version`
+-   If `git` is not installed
+    -   On mac: 
+        -   In terminal: `xcode-select --install`
+        -   Or, if Homebrew is already installed: `brew install git`
+    -   On Windows: 
+        -   In PowerShell: `winget install --id Git.Git -e --source winget`
+
+## Github (`git clone`)
+
+-   Only need one-time configuration to create the local repo
+-   In terminal/PowerShell, clone via HTTPS route as an example: 
+    -   `cd desired-local-directory`
+    -   `git clone https://github.com/UMN-ECP-PMX/ecp8506_26f.git`
+    -   `cd ecp8506_26f`
+
+## Github (`git pull`)
+
+-   Pull before every session to obtain the up-to-date course materials
+    -   `cd desired-local-directory/ecp8506_26f`
+    -   `git pull`
+-   Do NOT edit files inside the course repo unless instructed (read-only).
+-   Work on homework assignments / take class notes outside of the local repo. 
+
+## Minnesota Supercomputing institute (MSI){style="font-size: 0.8em"}
+
+-   Homepage: <https://msi.umn.edu/>
+-   Access to MSI resources is available to Principal Investigators (PIs). Individual can access MSI by
+    -   Participating a PI's research group
+    -   Participating a MSI class account (`ecp8506`, will be available until **01/07/2027**)
+
+## VPN
+
+MSI is accessible if you are
+
+-   You are connected to "eduroam" network on campus.
+-   You are off campus but connecting to the University’s Virtual Private Network (VPN).
+    -   VPN download, install, and connect: <https://it.umn.edu/services-technologies/virtual-private-network-vpn>
+    -   do NOT select the channel named **“UMN - Departmental Pools”**.
+
+## MSI
+
+-   Working on MSI is optional for ECP8506
+-   Several ways are available to interact with MSI
+    -   [Open Ondemand](https://ondemand.msi.umn.edu/pun/sys/dashboard/)
+
