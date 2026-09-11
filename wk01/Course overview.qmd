@@ -32,27 +32,34 @@ Shen Cheng, Ph.D.
 
 ## Schedule
 
--   10 am -12 pm weekly on Fridays
--   Remote **ONLY**:
+-   10:10 am -12:05 pm weekly on Fridays
+-   Remote **(most sessions)**:
     -   Zoom: <https://umn.zoom.us/j/96936402074?pwd=31zGLervZLXnKbZBOo7grepMeLmelH.1&jst=2>
+-   In-person **(maybe)**: Health Sciences Edu Ctr (HSEC) 4-107
 -   Course recordings will be shared via [Gdrive](https://drive.google.com/drive/u/0/folders/1kfPE1aeyKEH6898e0NQxo_cF_aKa5nPi)
 
-## Important Links
+## Important Links {style="font-size: 0.8em"}
 
 -   [Github](https://github.com/UMN-ECP-PMX/ecp8506_26f)
+    -   Required
+    -   Publicly available
+    -   Manage all course materials
+    -   Syllabus
 -   Minnesota Supercomputing Institute (MSI) group: `ecp8506`
+    -   Optional
+    -   Use your respective personal device is also fine
 -   Communications:
     -   Emails
-    
-## Parental leave 
+
+## Parental leave
 
 -   09/12/2026-10/22/2026
 -   Will still be available on my email
--   Alternative contacts while leave: 
+-   Alternative contacts while leave:
     -   Kate Rask (rask0063\@umn.edu)
     -   Melanie Nicol (mrnicol\@umn.edu)
-    
-## Grading{style="font-size: 0.8em"}
+
+## Grading {style="font-size: 0.8em"}
 
 -   Homework: 50%
     -   Introduction to R
@@ -63,12 +70,12 @@ Shen Cheng, Ph.D.
 -   Class participation 50%
     -   Expect to attend each session if register for the course
     -   Prior notification needed if absence is anticipated
-    
+
 ## Objectives of the course
 
 -   Understand the concepts of model-informed decision making using pharmacometric simulations.
 -   Learn relevant tools (i.e., **`mrgsolve`**) to perform pharmacometric simulations.
--   Know different simulation methods, and be able to identify a simulation method given application scenarios.  
+-   Know different simulation methods, and be able to identify a simulation method given application scenarios.
 
 ## What to Expect...
 
@@ -80,16 +87,16 @@ Shen Cheng, Ph.D.
 
 -   Check if `git` is installed locally: `git --version`
 -   If `git` is not installed
-    -   On mac: 
+    -   On mac:
         -   In terminal: `xcode-select --install`
         -   Or, if Homebrew is already installed: `brew install git`
-    -   On Windows: 
+    -   On Windows:
         -   In PowerShell: `winget install --id Git.Git -e --source winget`
 
 ## Github (`git clone`)
 
 -   Only need one-time configuration to create the local repo
--   In terminal/PowerShell, clone via HTTPS route as an example: 
+-   In terminal/PowerShell, clone via HTTPS route as an example:
     -   `cd desired-local-directory`
     -   `git clone https://github.com/UMN-ECP-PMX/ecp8506_26f.git`
     -   `cd ecp8506_26f`
@@ -100,9 +107,9 @@ Shen Cheng, Ph.D.
     -   `cd desired-local-directory/ecp8506_26f`
     -   `git pull`
 -   Do NOT edit files inside the course repo unless instructed (read-only).
--   Work on homework assignments / take class notes outside of the local repo. 
+-   Work on homework assignments / take class notes outside of the local repo.
 
-## Minnesota Supercomputing institute (MSI){style="font-size: 0.8em"}
+## Minnesota Supercomputing institute (MSI) {style="font-size: 0.8em"}
 
 -   Homepage: <https://msi.umn.edu/>
 -   Access to MSI resources is available to Principal Investigators (PIs). Individual can access MSI by
@@ -123,4 +130,3 @@ MSI is accessible if you are
 -   Working on MSI is optional for ECP8506
 -   Several ways are available to interact with MSI
     -   [Open Ondemand](https://ondemand.msi.umn.edu/pun/sys/dashboard/)
-
