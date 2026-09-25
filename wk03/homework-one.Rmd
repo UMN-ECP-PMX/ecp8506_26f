@@ -1,0 +1,76 @@
+---
+title: "Intro to R Part 1 Homework Assignment"
+author: "Student Name"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+## Problem #1: Building a data.frame
+
+**Instructions:**
+
+* Create a `data.frame` matching the table shown below:
+
+| ID | TIME | DV | SEX | WT | ROW |
+|----|------|----|-----|----|-----|
+| 1  | 1    | 2  | M   | 70 | 1   |
+| 1  | 6    | 4  | M   | 70 | 2   |
+| 1  | 24   | 6  | M   | 72 | 3   |
+| 2  | 1    | 2  | F   | 64 | 4   |
+| 2  | 6    | 4  | F   | 64 | 5   |
+| 2  | 24   | 6  | F   | 63 | 6   |
+| 3  | 1    | 2  | M   | 98 | 7   |
+| 3  | 6    | 4  | M   | 98 | 8   |
+| 3  | 24   | 6  | M   | 98 | 9   |
+
+* Save the output to an object named "dat"
+
+* Verify that the structure and contents of dat are correct
+
+* Save "dat" to disk in your working directory with the name "output.csv"
+
+*Hint: type `? rep()` into the console to see help for the replicate function.*
+
+**Answer:**
+```{r hw1-building-dataframe}
+# Write your R code here
+
+```
+
+## Problem #2: Modifying an existing data set
+
+**Instructions:**
+
+* Import `mad-nonmem.csv`
+
+* Filter out commented rows (i.e. in column C, rows equal to "C")
+
+* Create new columns in the data set:
+
+  * `TIMED` = time in days, rounded to the nearest hundredth
+
+  * `SEX_c` = recode SEX column from 0/1 to M/F
+
+  * `DOSE_f` = factor of doses in ascending order
+
+* Drop all columns between `TAD` and `ADDL` (inclusive), and `DTTM`
+
+* Move `TIMED` next to the `TIME` column
+
+**Answer:**
+```{r hw2-modifying-data}
+# Write your R code here
+
+```
+
+## Problem #3: Restructuring a data set
+
+**Instructions:**
+
+* Create a new data frame using a `pivot_*` function to create a three-column data set, where the first column is the ID, the second column is the name of a covariate, and the third column is the value of a covariate.
+
+**Answer:**
+```{r hw3-restructuring-data}
+# Write your R code here
+
+```
