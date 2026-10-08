@@ -1,6 +1,10 @@
 Version: 1
 
 Packages:
+  - Matrix
+  - MatrixModels
+  - fs
+  - ragg
   - tidyverse
   - pdftools
   - data.table
@@ -23,9 +27,23 @@ Packages:
 Repos:
   - MPN: https://mpn.metworx.com/snapshots/stable/2026-04-25
   - CRAN: https://cran.r-project.org
+  - CRAN_2024_01_15: https://packagemanager.posit.co/cran/2024-01-15
+  - CRAN_2024_04_26: https://packagemanager.posit.co/cran/2024-04-26
 
 Customizations:
   Packages:
+  - Matrix:
+      Type: source
+      Repo: CRAN_2024_01_15
+  - MatrixModels:
+      Type: source
+      Repo: CRAN_2024_01_15
+  - fs:
+      Type: source
+      Repo: CRAN_2024_04_26
+  - ragg:
+      Type: source
+      Repo: CRAN_2024_01_15
   - pdftools: 
       Type: source
       Env:
