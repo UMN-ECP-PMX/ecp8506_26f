@@ -1,0 +1,30 @@
+project:
+  type: book
+  output-dir: docs
+
+book:
+  title: "Intro to mrgsolve"
+  author: ["Kyle Baron"]
+  date: "10/16/2026"
+  chapters:
+    - index.qmd
+    - intro.qmd
+    - big-picture.qmd
+    - specification-1.qmd
+    - model-object.qmd
+    - event-object.qmd
+    - data-set.qmd
+    - simulation.qmd
+    - parameters.qmd
+    - specification-2.qmd
+    - validation.qmd
+    - replicate.qmd
+
+format:
+  html:
+    theme: cosmo
+    freeze: auto
+    linkcolor: "#097f5f"
+    toc-title: Contents
+    code-overflow: wrap
+    fig-height: 4
