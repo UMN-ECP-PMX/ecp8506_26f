@@ -1,0 +1,5 @@
+/.quarto/
+book/build
+book/_freeze
+
+**/*.quarto_ipynb
