@@ -204,3 +204,5 @@ But `mrgsolve` is _not_ a clone of NONMEM.
 - Sensitivity analysis: <https://github.com/kylebaron/mrgsim.sa>
 
 - Manage large outputs: <https://github.com/metrumresearchgroup/paquet>
+
+- Simulate to parquet: <https://github.com/metrumresearchgroup/mrgsim.ds>

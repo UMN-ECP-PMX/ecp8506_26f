@@ -1,2 +1,5 @@
 /.quarto/
 **/*.quarto_ipynb
+book/build
+book/_freeze
+book/.DS_Store
