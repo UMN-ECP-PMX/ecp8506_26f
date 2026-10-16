@@ -4,8 +4,10 @@ project:
 
 book:
   title: "Intro to mrgsolve"
+  subtitle: ECP8506 Fall 2026
   author: ["Kyle Baron"]
   date: "10/16/2026"
+  output-file: intro-to-mrgsolve
   chapters:
     - index.qmd
     - intro.qmd
@@ -28,3 +30,9 @@ format:
     toc-title: Contents
     code-overflow: wrap
     fig-height: 4
+  # pdf:
+  #   documentclass: scrbook
+  #   freeze: auto
+  #   linkcolor: "#097f5f"
+  #   code-overflow: wrap
+  #   fig-height: 4
