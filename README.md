@@ -21,5 +21,5 @@
 | 11    | 11/20/2026   | Virtual patient simulations                          | Curtis Johnston, PharmD & Shen Cheng, PhD                  |
 | 12    | 11/27/2026   | Thanksgiving **NO CLASS**                            |                                                            |
 | 13    | 12/04/2026   | Simulation with parameter uncertainty 1              | Mutaz Jaber, PharmD, PhD                                   |
-| 14    | 12/11/2026   | Simulation with parameter uncertainty 2              | Kyle Baron, PharmD, PhD & Shen Cheng, PhD                  |
+| 14    | 12/11/2026   | Simulation with parameter uncertainty 2              | Kyle Baron, PharmD, PhD                                    |
 | 15    | 12/18/2026   | Case studies (MIPD + MIDD)                           | Takuto Takahashi, MD, PhD & Ya-Feng (Jay) Wen, PharmD, PhD |

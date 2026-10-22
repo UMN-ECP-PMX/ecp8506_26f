@@ -8,24 +8,200 @@ format:
 editor: visual
 ---
 
+```{r}
+#| echo: false
+
+library(tidyverse)
+library(mrgsolve)
+library(gridExtra)
+library(here)
+
+theme_set(theme_bw())
+options(warn = -1)
+
+# Functions to make summary PK profiles 
+summ_pk_plot <- function(df, .x=NTIME, .y=DV, .facet=DOSE, 
+                     logy=TRUE, show_obs=FALSE){
+  dat <- df %>% group_by({{.x}}, {{.facet}}) %>% 
+    summarise(
+      as_tibble_row(
+        quantile({{.y}}, c(0.025, 0.500, 0.975),na.rm = TRUE),
+        .name_repair= ~ c("lo", "mi", "hi")
+      ), 
+      .groups = "drop") 
+  
+  p <- dat %>% ggplot(aes(x={{.x}}))+
+    geom_line(aes(y=mi))+
+    geom_ribbon(aes(ymin=lo, ymax=hi), alpha=0.25)+
+    facet_grid(vars({{.facet}}), labeller=label_both)+
+    ylab("")
+  
+  if(show_obs) p <- p + geom_point(data=df, aes(x={{.x}}, y=DV))
+  if(logy) p <- p + scale_y_log10()
+  return(p)
+}
+
+# Functions to plot raw PK (conc-time) profiles
+raw_pk_plot <- function(df, .x=NTIME, .y=DV, .group=ID, .facet=DOSE, 
+                   logy=TRUE){
+  p <- df %>% ggplot(aes(x={{.x}}, y={{.y}}, group={{.group}}))+
+    geom_point()+geom_line(alpha=0.2)+
+    facet_grid(rows=vars({{.facet}}), labeller=label_both)
+  
+  if(logy) p <- p + scale_y_log10()
+  
+  return(p)
+}
+
+# Functions to. ake VPC plots
+vpcplot <- function(obs_df, sim_df, 
+                    .x=NTIME, .yobs=DV, .ysim=Y, .facet=DOSE, 
+                    .color=NULL, .xlab=NULL, .ylab=NULL, 
+                    percentile=c(0.10, 0.50, 0.90), 
+                    prob=c(0.10, 0.50, 0.90), 
+                    logy=TRUE, show_obs=FALSE, bins=NULL, 
+                    pcvpc=FALSE){
+  
+  
+  # Assign ticks, calculate middles for plotting
+  if (is.null(bins)) {
+    ticks <- NULL
+    mids  <- NULL
+  } else {
+    bins <- sort(unique(as.numeric(bins)))
+    ticks <- cut(bins, breaks = bins)[-1]
+    mids  <- (bins[-1] + bins[-length(bins)]) / 2 # Calculate midpoints for plotting
+  }
+  
+  if (is.null(ticks)){
+    obs_df <- obs_df %>% mutate(.bin = {{.x}},.x_plot = {{.x}})
+    sim_df <- sim_df %>% mutate(.bin = {{.x}},.x_plot = {{.x}})
+  }else{
+    obs_df <- obs_df %>% mutate(
+      .bin = cut({{.x}}, breaks = bins, include.lowest = TRUE, right = TRUE),
+      .x_plot = mids[as.integer(.bin)])
+    sim_df <- sim_df %>% mutate(
+      .bin = cut({{.x}}, breaks = bins, include.lowest = TRUE, right = TRUE),
+      .x_plot = mids[as.integer(.bin)])
+  }
+  
+  # Summarise observed percentiles
+   obs <- obs_df %>% group_by(.bin, .x_plot, {{.facet}}) %>% 
+      summarise(
+        as_tibble_row(
+          quantile({{.yobs}}, percentile,na.rm = TRUE),
+          .name_repair= ~ c("lo", "mi", "hi")
+        ), 
+        .groups = "drop")
+  
+  # Summarise simulated percentiles
+  sim <- sim_df %>% group_by(.bin, .x_plot, {{.facet}}, IREP) %>% 
+    summarise(
+      as_tibble_row(
+        quantile({{.ysim}}, percentile,na.rm = TRUE),
+        .name_repair= ~ c("lo", "mi", "hi")
+      ), 
+      .groups = "drop") 
+  
+  # Prediction correction
+  if(pcvpc){
+    # stopifnot("PRED" %in% names(sim_df))
+    
+    obs <- obs_df %>% mutate(.yobs = {{.yobs}}/PRED) %>% 
+      group_by(.bin, .x_plot, {{.facet}}) %>% 
+      mutate(pred_bin = median(PRED)) %>% 
+      mutate(.yobs = .yobs*pred_bin) %>% 
+      summarise(
+        as_tibble_row(
+          quantile(.yobs, percentile,na.rm = TRUE),
+          .name_repair= ~ c("lo", "mi", "hi")
+        ), 
+        .groups = "drop")
+    
+    sim <- sim_df %>% mutate(.ysim = {{.ysim}}/PRED) %>% 
+      group_by(.bin, .x_plot, {{.facet}}, IREP) %>% 
+      mutate(pred_bin = median(PRED)) %>% 
+      mutate(.ysim = .ysim*pred_bin) %>% 
+      summarise(
+        as_tibble_row(
+          quantile(.ysim, percentile,na.rm = TRUE),
+          .name_repair= ~ c("lo", "mi", "hi")
+        ), 
+        .groups = "drop")
+  }
+  
+  # Summarise prediction intervals of simulated percentiles
+  sim <- sim %>% group_by(.bin, .x_plot, {{.facet}}) %>% 
+    summarise(
+      across(c("lo", "mi", "hi"),
+             ~ list(setNames(
+               quantile(.x, prob, na.rm = TRUE),
+               c("lo", "mi", "hi")
+             ))),
+      .groups = "drop"
+    ) %>%
+    # widen each list-column (one per Y) into 3 numeric columns
+    unnest_wider(c("lo", "mi", "hi"), names_sep = "_")
+  
+  p <- ggplot()+
+    geom_line(data=obs, aes(x=.x_plot, y=lo), linetype=2)+
+    geom_line(data=obs, aes(x=.x_plot, y=mi), linetype=1)+
+    geom_line(data=obs, aes(x=.x_plot, y=hi), linetype=2)+
+    geom_ribbon(data=sim, aes(x=.x_plot, ymin=lo_lo, ymax=lo_hi), alpha=0.25, fill="#ffcc33")+
+    geom_ribbon(data=sim, aes(x=.x_plot, ymin=mi_lo, ymax=mi_hi), alpha=0.25, fill="#7A0019")+
+    geom_ribbon(data=sim, aes(x=.x_plot, ymin=hi_lo, ymax=hi_hi), alpha=0.25, fill="#ffcc33")+
+    facet_grid(vars({{.facet}}), labeller=label_both)
+  
+  if(!is.null(xlab)) p <- p+xlab(.xlab)
+  if(!is.null(ylab)) p <- p+ylab(.ylab)
+  
+  if(show_obs) p <- p + geom_point(data=obs_df, aes(x={{.x}}, y={{.yobs}}, color={{.color}}))
+  
+  if(pcvpc&show_obs){
+    obs_df2 <- obs_df %>% mutate(.yobs = {{.yobs}}/PRED) %>% 
+      group_by(.bin, .x_plot, {{.facet}}) %>% 
+      mutate(pred_bin = median(PRED)) %>% 
+      mutate(.yobs = .yobs*pred_bin) 
+    p <- p + geom_point(data=obs_df2, aes(x={{.x}}, y=.yobs, color={{.color}}))
+  }
+  
+  if(!is.null(bins)) p <- p + scale_x_continuous(
+    limits = range(bins),
+    expand = expansion(mult = c(0, 0.02)),
+    sec.axis = dup_axis(
+      name   = NULL,
+      breaks = bins,           # tick positions on top
+      labels = rep("", length(bins))  # no labels, ticks only
+    )) + theme(
+      axis.ticks.x.top  = element_line(),
+      axis.ticks.length.x.top = unit(5, "pt")
+    )
+  
+  if(logy) p <- p + scale_y_log10()
+  
+  return(p)
+}
+
+```
+
 # Drug X {.smaller}
 
-- Drug X is a small molecule drug under early-phase clinical investigation to treat Disease Y in pediatric patients (age 2-18 years).
+-   Drug X is a small molecule drug under early-phase clinical investigation to treat Disease Y in pediatric patients (age 2-18 years).
 
-- An phase-I single ascending dose (SAD) clinical study has been completed to investigate the PK of drug X, with 50 patients receiving 1, 2, 5, 10 and 20 mg dose of drug X.
+-   An phase-I single ascending dose (SAD) clinical study has been completed to investigate the PK of drug X, with 50 patients receiving 1, 2, 5, 10 and 20 mg dose of drug X.
 
-- A population PK model was developed using these PK data (`./wk10/model/hwwk6.mod`).
+-   A population PK model was developed using these PK data (`./wk10/model/hwwk6.mod`).
 
-- Some efficacy related endpoints were also collected and the clinical team are interested in exploring exposure-response relationships.
+-   Some efficacy related endpoints were also collected and the clinical team are interested in exploring exposure-response relationships.
 
 # Exercise 1: Stochastic Simulation {.smaller}
 
-- The study team is now designing a Phase 2 proof of concept (POC) study, which they plan to use a twice daily dose (BID) dosing. They want to understand what dosage levels are appropriate to test.
+-   The study team is now designing a Phase 2 proof of concept (POC) study, which they plan to use a twice daily dose (BID) dosing. They want to understand what dosage levels are appropriate to test.
 
-- Preclinical study shows:
+-   Preclinical study shows:
 
-  - IC90 of drug X is **1 ug/L**.
-  - Drug X concentration above **15 ug/L** is associated with dose-limit toxicity.
+    -   IC90 of drug X is **1 ug/L**.
+    -   Drug X concentration above **15 ug/L** is associated with dose-limit toxicity.
 
 ## Exercise 1: Question {.smaller}
 
@@ -33,9 +209,9 @@ editor: visual
 
 Considering steady-state is achieved after 4 days with BID dosing. The study team is wondering:
 
-- At what dose levels can we achieve a steady-state Cmin \> 1 ug/L in \> 80% patients.
+-   At what dose levels can we achieve a steady-state Cmin \> 1 ug/L in \> 80% patients.
 
-- At what dose levels can we maintain a steady-state Cmax \> 15 ug/L in \< 10% patients.
+-   At what dose levels can we maintain a steady-state Cmax \> 15 ug/L in \< 10% patients.
 
 ## Workflow-Stochastic Simulations
 
@@ -49,17 +225,17 @@ Considering steady-state is achieved after 4 days with BID dosing. The study tea
 
 **Files:**
 
-- `wk10/model/hwwk6.mod`: `mrgsolve` model for Drug X.
-- `wk10/ex1.R`: `R` script to implement simulation.
-- `wk10/data/pop.csv`: population covariate for simulation.
+-   `wk10/model/hwwk6.mod`: `mrgsolve` model for Drug X.
+-   `wk10/ex1.R`: `R` script to implement simulation.
+-   `wk10/data/pop.csv`: population covariate for simulation.
 
 **Implementation notes:**
 
-- Don't need residual variability in simulation (`mod <- mod %>% zero_re(sigma)`).\
-- Use `wk10/data/pop.csv` for population covariates.\
-- Use `addl` and `ii` to implement multiple dosing (e.g., BID).
-- Weight-based dosing.
-- Need to have `rate=-2` to enable the use of dosing duration (`D1`) in the model.
+-   Don't need residual variability in simulation (`mod <- mod %>% zero_re(sigma)`).\
+-   Use `wk10/data/pop.csv` for population covariates.\
+-   Use `addl` and `ii` to implement multiple dosing (e.g., BID).
+-   Weight-based dosing.
+-   Need to have `rate=-2` to enable the use of dosing duration (`D1`) in the model.
 
 ## Hands-on Session: Exercise 1
 
@@ -99,23 +275,17 @@ Considering steady-state is achieved after 4 days with BID dosing. The study tea
 
 # Visual Predictive Checks (VPCs) {.smaller}
 
-- Simulation-based diagnosis.
-- Standard model diagnostics use residuals and other comparisons between observed and predicted values.
-- Simulation-based diagnostics simulate from the model, and compare simulated data to observed data.
-  - If a model is developed to adequately characterize the data, the model can produce which are similar to that used to fit (i.e., develop) it.
+-   Simulation-based diagnosis.
+-   Standard model diagnostics use residuals and other comparisons between observed and predicted values.
+-   Simulation-based diagnostics simulate from the model, and compare simulated data to observed data.
+    -   If a model is developed to adequately characterize the data, the model can produce which are similar to that used to fit (i.e., develop) it.
 
 ## Example model {.smaller}
 
-```{r model_code, echo=TRUE}
+```{r}
+#| echo: true
 #| code-fold: true
 #| code-summary: "Show the code"
-
-library(tidyverse)
-library(mrgsolve)
-library(gridExtra)
-
-theme_set(theme_bw())
-options(warn = -1)
 
 code <- '
   [ prob ]
@@ -195,13 +365,14 @@ mod <- mcode("example", code)
 ```
 
 ```{r}
+#| echo: true
 see(mod)
 ```
 
 ## Example data {.smaller}
 
-```{r load_data}
-#| echo: true
+```{r}
+#| echo: false
 #| code-fold: true
 #| code-summary: "Show the code"
 
@@ -1329,7 +1500,9 @@ data <- structure(list(C = c(".", ".", ".", ".", ".", ".", ".", ".",
     179.2)), class = "data.frame", row.names = c(NA, -651L))
 ```
 
-```{r check_data, echo=TRUE}
+```{r}
+#| echo: true
+
 head(data)
 ```
 
@@ -1339,7 +1512,8 @@ head(data)
 ::: {.column width="50%"}
 Plot data.
 
-```{r plot_data, echo=TRUE}
+```{r}
+#| echo: true
 
 filter(data, EVID==0) %>% 
   ggplot(aes(x=NTIME, y=DV, group=ID))+
@@ -1349,24 +1523,25 @@ filter(data, EVID==0) %>%
   scale_y_log10()
 
 ```
-
 :::
-::: {.column width="50%"}
 
+::: {.column width="50%"}
 There are three dose group: the lower dose group 200 has relatively intensive sampling, and the higher dose group has relatively sparse sampling. Let's check the number of subjects per dose group.
 
-```{r, check_ind_per_dose, echo=TRUE}
+```{r}
+#| echo: true
+
 data %>% distinct(ID, .keep_all=TRUE) %>% 
   count(DOSE)
 ```
-
 :::
-::::
+:::::
 
 ## Simulation and comparison? {.smaller}
 
 ```{r}
 #| echo: true
+#| warning: false
 #| code-fold: true
 #| code-summary: "Show the code"
 
@@ -1383,23 +1558,13 @@ withr::with_seed(
 
 obs <- data_200 %>% filter(EVID==0)
 
-
-# Functions to plot raw PK (conc-time) profiles
-raw_pk_plot <- function(df, .x=NTIME, .y=DV, .group=ID, .facet=DOSE, 
-                   logy=TRUE){
-  p <- df %>% ggplot(aes(x={{.x}}, y={{.y}}, group={{.group}}))+
-    geom_point()+geom_line(alpha=0.2)+
-    facet_grid(rows=vars({{.facet}}), labeller=label_both)
-  
-  if(logy) p <- p + scale_y_log10()
-  
-  return(p)
-}
-
 p1 <- raw_pk_plot(obs)+ggtitle("Observed")+scale_y_log10(limits = c(0.0001, 1000))
 p2 <- raw_pk_plot(sim, .y=Y)+ggtitle("Simulated")+scale_y_log10(limits = c(0.0001, 1000))
 grid.arrange(p1, p2, ncol=2)
+```
 
+```{r}
+#| echo: false
 rm(p1,p2)
 ```
 
@@ -1410,28 +1575,6 @@ rm(p1,p2)
 #| code-fold: true
 #| code-summary: "Show the code"
 
-# Functions to make summary PK profiles 
-summ_pk_plot <- function(df, .x=NTIME, .y=DV, .facet=DOSE, 
-                     logy=TRUE, show_obs=FALSE){
-  dat <- df %>% group_by({{.x}}, {{.facet}}) %>% 
-    summarise(
-      as_tibble_row(
-        quantile({{.y}}, c(0.025, 0.500, 0.975),na.rm = TRUE),
-        .name_repair= ~ c("lo", "mi", "hi")
-      ), 
-      .groups = "drop") 
-  
-  p <- dat %>% ggplot(aes(x={{.x}}))+
-    geom_line(aes(y=mi))+
-    geom_ribbon(aes(ymin=lo, ymax=hi), alpha=0.25)+
-    facet_grid(vars({{.facet}}), labeller=label_both)+
-    ylab("")
-  
-  if(show_obs) p <- p + geom_point(data=df, aes(x={{.x}}, y=DV))
-  if(logy) p <- p + scale_y_log10()
-  return(p)
-}
-
 p1 <- summ_pk_plot(sim, .y=Y, show_obs=TRUE)
 p1
 ```
@@ -1440,22 +1583,35 @@ p1
 
 However, we may not reply on one **stochastic** simulation to evaluate the model performance. If we simulate using the same settings for a second time, it will look different compared to the first simulation.
 
-```{r, echo=TRUE, warning=FALSE}
+```{r}
+#| echo: true
+#| warning: false
+#| code-fold: true
+#| code-summary: "Show the code"
+
 withr::with_seed(
   seed=321, 
   sim2 <- mrgsim_df(mod, data_200, obsonly=TRUE, recover="DV,NTIME,DOSE")
   )
 p2 <- summ_pk_plot(sim2, .y=Y, show_obs=TRUE)
 grid.arrange(p1, p2, ncol=2)
-rm(p1, p2, sim, sim2) # Remove figure outputs to save RAM
 ```
 
+```{r}
+#| echo: false
+rm(p1, p2, sim, sim2) # Remove figure outputs to save RAM
+```
 
 ## Simulation with replicates {.smaller}
 
 Therefore, we need to simulate with replicates (e.g., n=100) to evaluate the totality of the stochastic simulations.
 
-```{r, echo=TRUE, warning=FALSE}
+```{r}
+#| echo: true
+#| warning: false
+#| code-fold: false
+#| code-summary: "Show the code"
+
 rep <- 100
 
 withr::with_seed(seed=1314, 
@@ -1476,17 +1632,23 @@ withr::with_seed(seed=1314,
 
 ## But then how we should effectively visualize it? {.smaller}
 
-```{r, echo=TRUE, warning=FALSE}
+```{r}
+#| echo: true
+#| warning: false
+#| code-fold: true
+#| code-summary: "Show the code"
 p1 <- sim %>% filter(IREP<10) %>% 
   summ_pk_plot(., .y=Y, show_obs=TRUE)+
   facet_wrap(~IREP)
 p1
+```
+
+```{r}
+#| echo: false
 rm(p1) # Remove figure outputs to save RAM
 ```
 
-## Visual predictive checks (VPC) {.smaller}
-
-VPC was created as an effective way to visualize simulation versus prediction for the evaluation of model predictive performance:
+## VPC: Observations {.smaller}
 
 -   For observed PK profiles, we will summarize:
 
@@ -1495,6 +1657,8 @@ VPC was created as an effective way to visualize simulation versus prediction fo
     -   50th percentile.
 
     -   90th percentile.
+
+## VPC: Simulations {.smaller}
 
 -   For simulated PK profiles, we will summarize:
 
@@ -1518,7 +1682,7 @@ VPC was created as an effective way to visualize simulation versus prediction fo
 
 ## An example VPC {.smaller}
 
-```{r, echo=TRUE}
+```{r}
 #| echo: true
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -1578,8 +1742,16 @@ vpc
 
 We frequently see VPCs with observed concentrations shown as dots, but this is not something required for diagnostic purposes.
 
-```{r, echo=TRUE}
+```{r}
+#| echo: true
+#| code-fold: true
+#| code-summary: "Show the code"
 vpc + geom_point(data=filter(obs, BLQ==0), aes(x=NTIME, y=DV))
+```
+
+```{r}
+#| echo: false
+rm(vpc)
 ```
 
 ## Binning {.smaller}
@@ -1590,8 +1762,13 @@ If you have worked on creating VPCs before, an tedious (or somewhat annoying) is
 
 -   This makes the summarization of the percentiles across time become challenging.
 
-```{r binning1, echo=TRUE}
-#| fig-alt: "binning1"
+## Binning {.smaller}
+
+```{r}
+#| echo: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
 p1  <- raw_pk_plot(obs, .x=NTIME)+ggtitle("Nominal time")
 p2  <- raw_pk_plot(obs, .x=TIME)+ggtitle("Actual time")
 p3 <- vpcplot(obs_df=filter(obs, BLQ==0), 
@@ -1603,7 +1780,91 @@ p4 <- vpcplot(obs_df=filter(obs, BLQ==0),
               .x=TIME, show_obs = TRUE, .xlab = "Time", .ylab = "Concentrations")+
   ggtitle("VPC using actual time")
 grid.arrange(p1,p2,p3,p4,ncol=2)
+```
+
+```{r}
+#| echo: false
 rm(p1, p2, p3, p4) # Remove figure outputs to save RAM
 ```
 
+## Binning {.smaller}
 
+-   As we created VPCs using actual time without binning, the plot (bottom right) looks messy, losing diagnostic values.\
+-   This is why we want to bin observations based on time intervals when creating VPCs plots.\
+-   Essentially, this step classifies actual time into time intervals/bins (i.e., binning), and then summarize observations via grouping by time bins instead of actual times.
+
+## VPC after Binning {.smaller}
+
+```{r}
+#| echo: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+vpcplot(obs_df=filter(obs, BLQ==0), 
+        sim_df=filter(sim, Y>unique(obs$LLOQ)), 
+        .x=TIME, show_obs = TRUE, 
+        .xlab = "Time", .ylab = "Concentrations", 
+        bins = c(119, 120.15, 120.5, 122, 126, 130, 150))
+
+```
+
+## VPC in reality {.smaller}
+
+```{r}
+#| echo: true
+#| warning: false
+#| code-fold: true
+#| code-summary: "Show the code"
+
+rep <- 100
+
+withr::with_seed(seed=1314, 
+                 sim <- purrr::map(1:rep, function(.irep){
+                   mrgsim_df(mod, data_200, obsonly=TRUE, recover="DV,NTIME,DOSE") %>%
+                  mutate(IREP=.irep)
+                   }) %>% bind_rows()
+                 )
+
+```
+
+```{r}
+#| echo: true
+#| warning: false
+library(vpc)
+
+vpc(sim=filter(sim, Y>unique(obs$LLOQ)), 
+    obs=filter(obs, BLQ==0),
+    obs_cols=list(idv="TIME"), 
+    sim_cols=list(idv="TIME", dv="Y"), 
+    bins=c(119, 120.15, 120.5, 122, 126, 130, 150), 
+    show=list(obs_dv=TRUE), 
+    log_y=TRUE, 
+    log_y_min=0.1)
+```
+
+## VPC in reality {.smaller}
+
+```{r}
+#| echo: true
+#| warning: false
+library(tidyvpc)
+
+obs_data <- as.data.frame(filter(obs, BLQ==0))
+sim_data <- as.data.frame(filter(sim, Y>unique(obs$LLOQ))) 
+
+vpc <- observed(obs_data, x=TIME, y=DV) %>%
+  simulated(sim_data, xsim=TIME, ysim=Y, repl=IREP) %>%
+  binning(bin="breaks", breaks = c(119, 120.15, 120.5, 122, 126, 130, 150))%>%
+  vpcstats()
+plot(vpc) + scale_y_log10(labels = scales::label_log())
+
+```
+
+## VPC variants {.smaller}
+
+-   Landmark VPCs:
+
+![](./pics/landmark%20vpc.png){width="90%"}
+
+-   Prediction-corrected VPCs (pcVPCs): [M. Bergstrand, et al., AAPS J](2011https://www.ncbi.nlm.nih.gov/pubmed/21302010)
+-   Reference-corrected VPCs (rcVPCs): [M. Ibrahim, et al., AAPS J 2025](https://www.ncbi.nlm.nih.gov/pubmed/40299161)
