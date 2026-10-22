@@ -1,7 +1,7 @@
 ---
 title: "Validation"
 format: 
-  html:
+  pdf:
     toc: true
     embed-resources: true
 ---

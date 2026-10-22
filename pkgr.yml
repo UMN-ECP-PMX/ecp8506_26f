@@ -23,6 +23,8 @@ Packages:
   - car
   - yspec
   - logitnorm
+  - vpc
+  - tidyvpc
 
 Repos:
   - MPN: https://mpn.metworx.com/snapshots/stable/2026-04-25
