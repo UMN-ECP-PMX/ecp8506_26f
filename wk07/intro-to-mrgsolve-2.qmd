@@ -1220,7 +1220,7 @@ Resource: https://mrgsolve.org/user-guide/plugins.html
 
 - Translate a `NONMEM` model (`./wk07/nm-model/hwwk6.mod`) into a `mrgsolve` model.
   - Capture the individual predictions as a variable named `IPRED`.
-- Perform validation using the script (`./wk07/validation_hwwk6.qmd`). Knit into a `html` file for submission.
+- Perform validation using the script (`./wk07/validation_hwwk6.qmd`). Knit into a `pdf` file for submission.
 - Deadline: **Oct. 30 2026** before class
 - We will spend some time of the Oct. 30 in-class lecture to work on this together. So feel free to explore it by yourself before Oct. 30 lecture.
 
@@ -1372,6 +1372,9 @@ double KA=x[2]; // 3rd value of x
 <!-- <https://mrgsolve.org/user-guide/specification.html#sec-variables-macros> -->
 
 <!-- ``` r -->
+
 <!-- double mt1 = self.mtime(1.23 + ETA(1)); -->
+
 <!-- self.mevent(1.23 + ETA(1), 33); -->
+
 <!-- ``` -->
