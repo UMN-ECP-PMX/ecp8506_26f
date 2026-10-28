@@ -1,0 +1,75 @@
+---
+title: "Homework week 11"
+format: pdf
+editor: visual
+---
+
+# Background
+
+Drug X is a new compound being developed by pharmaceutical company ABC for the treatment of disease Y. A clinical pharmacokinetic (PK) study has been conducted in adults, and the resulting PK data were used to develop an initial population PK (PopPK) model in NONMEM.
+
+The NONMEM model has been successfully translated into mrgsolve, and the implementation has been validated against the original NONMEM model.
+
+The following files are provided:
+
+- **NONMEM model:** `./wk11/homework/nm-model/106.mod`
+- **NONMEM model outputs:** `./wk11/homework/nm-model/106/`
+- **NONMEM analysis dataset:** `./wk11/homework/data/analysis3.csv`
+- **mrgsolve model:** `./wk11/homework/mrg-model/106.cpp`
+- **Model validation report:** `./wk11/homework/validation.pdf`
+- **Model validation source file:** `./wk11/homework/validation.qmd`
+
+The recommended adult dose of Drug X is 100 $\mu$g once daily (q.d.).
+
+\newpage
+
+# Question 1: Individual Exposure Prediction Using EBEs
+
+The clinical development team at company ABC plans to conduct an exposure-response analysis in adults. To support this analysis, the team has requested individual exposure estimates, specifically the maximum plasma concentration ($C_{\max}$) and the area under the concentration-time curve from time zero to infinity ($AUC_{0-\infty}$), following a single 100 $\mu$g dose of Drug X.
+
+Using the provided PopPK model, estimate $C_{\max}$ and $AUC_{0-\infty}$ for each individual in the original analysis dataset (`./wk11/homework/data/analysis3.csv`).
+
+**Hints:**
+
+- Perform an empirical Bayes estimate (EBE)-based simulation using the individual ETA estimates from `./wk11/homework/mrg-model/106/106par.tab`.
+
+- Use individual predicted concentrations (`IPRED`) to calculate $C_{\max}$.
+
+- Calculate $AUC_{0-\infty}$ using the following equation:
+
+  $$AUC_{0-\infty} = \frac{Dose}{CL/F}$$
+
+  where $CL/F$ is the individual apparent clearance.
+
+\newpage
+
+# Question 2: Exposure Matching Between Adults and Adolescents
+
+Company ABC is planning a clinical PK study in adolescents aged 12–18 years. Before initiating the study, the clinical development team would like to identify potential adolescent dose levels that achieve systemic exposure comparable to that observed in adults following a single 100 $\mu$g dose of Drug X.
+
+You are tasked with using the established PopPK model to conduct virtual population simulations and evaluate potential adolescent dosing strategies.
+
+## 2.1 Virtual Population Generation
+
+Generate two virtual populations: one representing adults and the other representing adolescents. Each population should contain 100 virtual individuals.
+
+A dataset containing demographic information from the National Health and Nutrition Examination Survey (NHANES) is provided at:
+
+`./wk11/homework/data/nhanes-pop.csv`
+
+**Hints:**
+
+- Separate the NHANES dataset into adult and adolescent populations based on age.
+- Generate 100 virtual individuals for each population using either:
+  - A **resampling-based approach**, in which individuals are sampled from the observed demographic data.
+  - A **distribution-based approach**, in which demographic variables are simulated from distributions estimated using the NHANES data.
+- Preserve realistic demographic distributions and relationships between covariates when generating the virtual populations.
+
+## 2.2 Exposure Matching and Dose Selection
+
+Using the virtual populations generated in Question 2.1 and the provided PopPK model:
+
+1.  Simulate the distribution of $AUC_{0-\infty}$ in virtual adults following a single 100 $\mu$g dose of Drug X.
+2.  Simulate the distribution of $AUC_{0-\infty}$ in virtual adolescents following single doses of Drug X at several candidate dose levels.
+3.  Compare the simulated exposure distributions between adults and adolescents.
+4.  Based on your simulation results, recommend an adolescent dose (or dose range) that achieves exposure comparable to the adult reference population. Briefly justify your recommendation.

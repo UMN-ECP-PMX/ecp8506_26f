@@ -25,6 +25,22 @@ Packages:
   - logitnorm
   - vpc
   - tidyvpc
+  - devtools
+  - ggraph
+  # # pmxcopula dependencies
+  # - combinat
+  # - furrr
+  # - future
+  # - gridExtra
+  # - kde1d
+  # - ks
+  # - reshape2
+  # - rvinecopulib
+  # - sf
+  # - knitr
+  # - rmarkdown
+  # - testthat
+  # - remotes
 
 Repos:
   - MPN: https://mpn.metworx.com/snapshots/stable/2026-04-25
