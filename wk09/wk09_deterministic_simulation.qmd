@@ -65,7 +65,7 @@ editor: visual
 
 # Exercise 2: EBE Simulation {.smaller}
 
-- The study team want to explore the preliminary exposure-response relationships. They want you to derive the individual exposures (i.e., $C_{max}$ and $AUC_{0-48}$) in the analysis data set.
+- The study team wants to explore the preliminary exposure-response relationships. They want you to derive the individual exposures (i.e., $C_{max}$ and $AUC_{0-48}$) in the analysis data set.
 
 - **Question:** What are the individual $C_{max}$ and $AUC_{0-48}$ in the analysis data set?
 

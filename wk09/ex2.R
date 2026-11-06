@@ -100,7 +100,7 @@ pmplots::pm_grid(list(p1,p2), ncol=1)
 # It's your turn! ---------------------------------------------------------
 
 #' 1. Perform the EBE simulation using `cov_eta.csv` (Method 2)
-#'    Tips: (1) using `etasrc="data.all` inside `mrgsim()` to path in individual ETAs
+#'    Tips: (1) using `etasrc="data.all` inside `mrgsim()` to pass in individual ETAs
 #'          (2) using `mod`, NOT `mod_ebe`, for implementing "Method 2"
 #' 2. Check the simulation output as we did for "Method 1"
 #' 3. Can you come up with a method to check whether the simulation output 
